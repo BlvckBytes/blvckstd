@@ -888,6 +888,21 @@ jsonh_opres_t jsonh_insert_arr_null(dynarr_t *array)
 ============================================================================
 */
 
+char *jsonh_getter_errstr(const char *used_key, jsonh_opres_t opres)
+{
+  switch(opres)
+  {
+    case JOPRES_INVALID_KEY:
+    return strfmt_direct("Missing the property " QUOTSTR, used_key);
+
+    case JOPRES_DTYPE_MISMATCH:
+    return strfmt_direct("The datatype of the property " QUOTSTR " mismatches", used_key);
+
+    default:
+    return strfmt_direct("Unknown error");
+  }
+}
+
 /**
  * @brief Get a value from a json object by type, checks that the key
  * exists and the type matches

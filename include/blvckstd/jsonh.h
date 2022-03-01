@@ -390,6 +390,16 @@ jsonh_opres_t jsonh_insert_arr_null(dynarr_t *array);
 */
 
 /**
+ * @brief Convert a getter error to a string
+ * 
+ * @param used_key Key used in getter function
+ * @param opres Operation result from getter call
+ * 
+ * @return char* Human readable error-message
+ */
+char *jsonh_getter_errstr(const char *used_key, jsonh_opres_t opres);
+
+/**
  * @brief Get the value of a given key as another JSON object
  * 
  * @param jsonh Json handler instance
