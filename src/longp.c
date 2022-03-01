@@ -4,7 +4,7 @@ longp_errno_t longp(long *out, const char *s, int base)
 {
   // Either leading spaces or empty string, inconvertible
   char *end;
-  if (s[0] == '\0' || isspace(s[0]))
+  if (s[0] == '\0' || s[0] == ' ')
     return LONGP_INCONVERTIBLE;
 
   // Invoke and clean errno beforehand

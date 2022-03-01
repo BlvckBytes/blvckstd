@@ -1,10 +1,12 @@
 CC        := gcc
 SRC_FILES := $(wildcard src/*.c) $(wildcard src/*/*.c)
-TARG_LIB  := libblvckstd.dylib
-CFLAGS    := -Wall -I./include -shared -o $(TARG_LIB)
+CFLAGS    := -Wall -I./include -shared
+
+TARG_LIB_PATH := /usr/local/lib
+TARG_LIB  		:= libblvckstd.dylib
 
 $(TARG_LIB):
-	$(CC) $(CPPFLAGS) $(CFLAGS) -fPIC $(SRC_FILES)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -fPIC $(SRC_FILES) -o $(TARG_LIB_PATH)/$(TARG_LIB)
 
 clean:
-	rm -rf $(TARG_LIB)
+	rm -rf $(TARG_LIB_PATH)/$(TARG_LIB)
