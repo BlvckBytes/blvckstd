@@ -1,5 +1,5 @@
-CC        := gcc
-SRC_FILES := $(wildcard src/*.c) $(wildcard src/*/*.c)
+CC        := g++
+SRC_FILES := $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
 CFLAGS    := -Wall -I./include -shared
 
 TARG_LIB_PATH := /usr/local/lib
