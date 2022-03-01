@@ -254,6 +254,7 @@ bool jsonh_parse_literal(jsonh_cursor_t *cursor, char **err, jsonh_literal_t *ou
       || curr.c == '}'
       || curr.c == ']'
       || curr.c == ','
+      || (curr.c < ' ' || curr.c == 127) // Unprintables
     )
     {
       // Put back this delimiter to be picked up by the next routine

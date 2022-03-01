@@ -23,7 +23,7 @@ int proc()
   "     null,"
   "     true,"
   "     \"yes\","
-  "     false"
+  "     false\n"
   " ]"
   "}";
 
