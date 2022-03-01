@@ -135,14 +135,12 @@ bool htable_contains(htable_t *table, const char *key)
   htable_entry_t *slot = table->slots[slot_id];
 
   // Traverse linked list
-  htable_entry_t *prev_slot = NULL;
   while (slot)
   {
     // Search slot that contains this key
     if (strncmp(key, slot->key, HTABLE_MAX_KEYLEN) == 0)
       return true;
 
-    prev_slot = slot;
     slot = slot->_next;
   }
 
