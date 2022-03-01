@@ -25,6 +25,9 @@ int proc()
     return 1;
   }
 
+  scptr char *stringified = jsonh_stringify(res, 2);
+  printf("%s", stringified);
+
   char *hello = NULL;
   if (
     jsonh_get_str(res, "hello", &hello) != JOPRES_SUCCESS

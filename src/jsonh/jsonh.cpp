@@ -528,9 +528,6 @@ htable_t *jsonh_parse(const char *json, char **err)
   if (!jsonh_parse_obj(cursor, err, &res))
     return NULL;
 
-  scptr char *stringified = jsonh_stringify(res, 2);
-  dbginf("%s", stringified);
-
   return (htable_t *) mman_ref(res);
 }
 
