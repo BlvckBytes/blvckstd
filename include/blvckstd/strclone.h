@@ -9,7 +9,7 @@
 #include "blvckstd/mman.h"
 
 /**
- * @brief Clone a string safely by limiting it's length, returns NULL if the string was too large
+ * @brief Clone a string safely by limiting it's length
  * 
  * @param origin Original string to be cloned
  * @param max_len Maximum length of the clone

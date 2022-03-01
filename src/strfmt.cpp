@@ -29,8 +29,6 @@ bool vstrfmt(char **buf, size_t *offs, const char *fmt, va_list ap)
   if (offs) *offs += written;
   va_end(ap2);
   return true;
-
-  va_end(ap2);
 }
 
 bool strfmt(char **buf, size_t *offs, const char *fmt, ...)
