@@ -113,11 +113,14 @@ static void jsonh_parse_err(jsonh_cursor_t *cursor, char **err, const char *fmt,
   va_end(ap);
 
   // Append prefix and write into error buffer
-  *err = strfmt_direct(
-    "(%llu:%llu) -> %s",
-    cursor->line_index, cursor->char_index,
-    errmsg
-  );
+  if (err)
+  {
+    *err = strfmt_direct(
+      "(%llu:%llu) -> %s",
+      cursor->line_index, cursor->char_index,
+      errmsg
+    );
+  }
 }
 
 bool jsonh_parse_str(jsonh_cursor_t *cursor, char **err, char **out)
@@ -398,6 +401,8 @@ bool jsonh_parse_arr(jsonh_cursor_t *cursor, char **err, dynarr_t **out)
     return false;
   }
 
+  jsonh_parse_eat_whitespace(cursor);
+
   // Parse values until the end of array is reached
   scptr dynarr_t *arr = dynarr_make(16, 1024, mman_dealloc_nr);
   while ((curr = jsonh_cursor_peekc(cursor)).c != ']')
@@ -428,6 +433,8 @@ bool jsonh_parse_arr(jsonh_cursor_t *cursor, char **err, dynarr_t **out)
     }
   }
 
+  jsonh_parse_eat_whitespace(cursor);
+
   // Array end char
   if ((curr = jsonh_cursor_getc(cursor)).c != ']')
   {
@@ -448,6 +455,8 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
     jsonh_parse_err(cursor, err, "Expected object-begin but found >%c<", curr.c);
     return false;
   }
+
+  jsonh_parse_eat_whitespace(cursor);
 
   // Parse values until the end of array is reached
   scptr htable_t *obj = htable_make(1024, mman_dealloc_nr);
@@ -496,6 +505,8 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
       break;
     }
   }
+
+  jsonh_parse_eat_whitespace(cursor);
 
   // Object end char
   if ((curr = jsonh_cursor_getc(cursor)).c != '}')
