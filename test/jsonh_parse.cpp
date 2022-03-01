@@ -12,8 +12,19 @@ int proc()
 {
   const char *jsn = \
   "{"
-  " \"my-arr\": [\"hello world!\" , [5, -2.2, 4.23, \"hoi\", 3,-4,2],  54321.55311,  null   , false], "
-  "\"hello\": \"world\""
+  "  \"hello\": \"world\","
+  " \"my-arr\": ["
+  "     5,4,3"
+  "     ,"
+  "     2,"
+  "         "
+  "         2,"
+  "     44.3,"
+  "     null,"
+  "     true,"
+  "     \"yes\","
+  "     false"
+  " ]"
   "}";
 
   scptr char *err = NULL;
