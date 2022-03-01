@@ -8,7 +8,7 @@ void dbgerr(const char *fmt, ...)
   scptr char *str = vstrfmt_direct(fmt, ap);
   va_end(ap);
 
-  #ifdef DBGLOG_ARDUINO
+  #ifdef Arduino_h
   Serial.printf("ERR: %s", str);
   #else
   fprintf(stderr, "ERR: %s", str);
@@ -25,7 +25,7 @@ void dbginf(const char *fmt, ...)
   scptr char *str = vstrfmt_direct(fmt, ap);
   va_end(ap);
 
-  #ifdef DBGLOG_ARDUINO
+  #ifdef Arduino_h
   Serial.printf("INF: %s", str);
   #else
   fprintf(stdout, "INF: %s", str);

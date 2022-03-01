@@ -11,7 +11,7 @@
 #define DEBUG_ERR
 #define DEBUG_INF
 
-#ifdef DBGLOG_ARDUINO
+#ifdef Arduino_h
 #include <Arduino.h>
 #endif
 
