@@ -113,14 +113,11 @@ static void jsonh_parse_err(jsonh_cursor_t *cursor, char **err, const char *fmt,
   va_end(ap);
 
   // Append prefix and write into error buffer
-  if (err)
-  {
-    *err = strfmt_direct(
-      "(%llu:%llu) -> %s",
-      cursor->line_index, cursor->char_index,
-      errmsg
-    );
-  }
+  *err = strfmt_direct(
+    "(%ld:%ld) -> %s",
+    cursor->line_index, cursor->char_index,
+    errmsg
+  );
 }
 
 bool jsonh_parse_str(jsonh_cursor_t *cursor, char **err, char **out)
@@ -431,6 +428,7 @@ bool jsonh_parse_arr(jsonh_cursor_t *cursor, char **err, dynarr_t **out)
       jsonh_cursor_ungetc(cursor);
       break;
     }
+    jsonh_parse_eat_whitespace(cursor);
   }
 
   jsonh_parse_eat_whitespace(cursor);
@@ -504,6 +502,7 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
       jsonh_cursor_ungetc(cursor);
       break;
     }
+    jsonh_parse_eat_whitespace(cursor);
   }
 
   jsonh_parse_eat_whitespace(cursor);

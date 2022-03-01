@@ -11,11 +11,10 @@
 int proc()
 {
   const char *jsn = \
-  "{\n\t}";
-  // "{"
-  // " \"my-arr\": [\"hello world!\" , [5, -2.2, 4.23, \"hoi\", 3,-4,2],  54321.55311,  null   , false], "
-  // "\"hello\": \"world\""
-  // "}";
+  "{"
+  " \"my-arr\": [\"hello world!\" , [5, -2.2, 4.23, \"hoi\", 3,-4,2],  54321.55311,  null   , false], "
+  "\"hello\": \"world\""
+  "}";
 
   scptr char *err = NULL;
   scptr htable_t *res = jsonh_parse(jsn, &err);
