@@ -11,7 +11,8 @@ static volatile size_t mman_alloc_count, mman_dealloc_count;
 mman_meta_t *mman_fetch_meta(void *ptr)
 {
   // Do nothing for nullptrs
-  if (ptr == NULL) return NULL;
+  if (ptr == NULL)
+    return NULL;
 
   // Fetch the meta info allocated before the data block and
   // assure that it's actually a managed resource
@@ -48,10 +49,15 @@ INLINED static mman_meta_t *mman_create(
   clfn_t cf_wrapped
 )
 {
+  // Try to allocate the meta-head + it's data-block
   mman_meta_t *meta = (mman_meta_t *) malloc(
     sizeof(mman_meta_t) // Meta information
     + (block_size * num_blocks) // Data blocks
   );
+
+  // No more space available
+  if (!meta)
+    return NULL;
 
   *meta = (mman_meta_t) {
     .ptr = meta + 1,
@@ -62,6 +68,7 @@ INLINED static mman_meta_t *mman_create(
     .refs = 1
   };
 
+  // Clear the data-block on request
   if (zero_init)
     memset(meta->ptr, 0x0, num_blocks * block_size);
 
@@ -70,22 +77,36 @@ INLINED static mman_meta_t *mman_create(
 
 void *mman_alloc(size_t block_size, size_t num_blocks, mman_cleanup_f_t cf)
 {
+  // Create new meta-info
+  mman_meta_t *res = mman_create(block_size, num_blocks, false, cf, NULL);
+
+  // No more space
+  if (!res)
+    return NULL;
+
   // INFO: Increment the allocation count for debugging purposes
   atomic_increment(&mman_alloc_count);
-
-  // Create new meta-info and return a pointer to the data block
-  return mman_create(block_size, num_blocks, false, cf, NULL)->ptr;
+  return res->ptr;
 }
 
 void **mman_wrap(void *ptr, clfn_t cf)
 {
+  // No data received
+  if (!ptr)
+    return NULL;
+
+  // Create new meta-info
+  mman_meta_t *meta = mman_create(sizeof(void *), 1, false, NULL, cf);
+
+  // No more space
+  if (!meta)
+    return NULL;
+
   // INFO: Increment the allocation count for debugging purposes
   atomic_increment(&mman_alloc_count);
 
-  // Create new meta-info and return a pointer to the data block
   // The data-block is a pointer to the pointer that's being wrapped
   // It will point to the passed-in ptr
-  mman_meta_t *meta = mman_create(sizeof(void *), 1, false, NULL, cf);
   void **refptr = (void **) meta->ptr;
   *refptr = ptr;
 
@@ -94,15 +115,24 @@ void **mman_wrap(void *ptr, clfn_t cf)
 
 void *mman_calloc(size_t block_size, size_t num_blocks, mman_cleanup_f_t cf)
 {
+  // Create new meta-info
+  mman_meta_t *res = mman_create(block_size, num_blocks, true, cf, NULL);
+
+  // No more space
+  if (!res)
+    return NULL;
+
   // INFO: Increment the allocation count for debugging purposes
   atomic_increment(&mman_alloc_count);
-
-  // Create new meta-info and return a pointer to the data block
-  return mman_create(block_size, num_blocks, true, cf, NULL)->ptr;
+  return res->ptr;
 }
 
 mman_meta_t *mman_realloc(void **ptr_ptr, size_t block_size, size_t num_blocks)
 {
+  // No data received
+  if (!ptr_ptr || !(*ptr_ptr))
+    return NULL;
+
   // Receiving a pointer to the pointer to the reference, deref once
   void *ptr = *ptr_ptr;
 
@@ -119,6 +149,10 @@ mman_meta_t *mman_realloc(void **ptr_ptr, size_t block_size, size_t num_blocks)
     sizeof(mman_meta_t) // Meta information
     + (block_size * num_blocks) // Data blocks
   );
+
+  // No more space
+  if (!meta)
+    return NULL;
 
   // Update the copied meta-block
   meta->ptr = meta + 1;
@@ -138,6 +172,10 @@ mman_meta_t *mman_realloc(void **ptr_ptr, size_t block_size, size_t num_blocks)
 
 mman_result_t mman_dealloc_force(void *ptr)
 {
+  // Nothing to deallocate
+  if (!ptr)
+    return MMAN_NULLREF;
+
   mman_meta_t *meta = mman_fetch_meta(ptr);
   if (!meta)
   {
@@ -163,7 +201,10 @@ mman_result_t mman_dealloc_force(void *ptr)
 
 mman_result_t mman_dealloc(void *ptr)
 {
-  if (!ptr) return MMAN_NULLREF;
+  // Nothing to deallocate
+  if (!ptr)
+    return MMAN_NULLREF;
+
   mman_meta_t *meta = mman_fetch_meta(ptr);
   if (!meta)
     return MMAN_INVREF;
@@ -192,8 +233,18 @@ void mman_dealloc_attr(void *ptr_ptr)
 
 void *mman_ref(void *ptr)
 {
+  // No data received
+  if (!ptr)
+    return NULL;
+
   mman_meta_t *meta = mman_fetch_meta(ptr);
-  if (!meta) return NULL;
+
+  // Invalid pointer (not mman managed)
+  if (!meta)
+  {
+    dbgerr("ERROR: mman_ref received unknown ref!\n");
+    return NULL;
+  }
 
   // Increment number of references and return pointer to the data block
   atomic_increment(&meta->refs);
@@ -209,6 +260,8 @@ void *mman_ref(void *ptr)
 void mman_print_info()
 {
   // Print as errors to also have this screen in non-info-debug mode
+  // Cache the values before calling the log functions, as they themselves
+  // alter the state of those counts
   size_t ac = mman_alloc_count, deac = mman_dealloc_count;
   dbgerr("----------< MMAN Statistics >----------\n");
   dbgerr("> Allocated: %lu\n", ac);

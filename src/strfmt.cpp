@@ -19,8 +19,10 @@ bool vstrfmt(char **buf, size_t *offs, const char *fmt, va_list ap)
   {
     size_t diff = needed - buf_avail;
 
-    // Extend by the difference
-    if (!mman_realloc((void **) buf, sizeof(char), buf_len + diff)) return false;
+    // Extend by the difference, check if there was enough space
+    if (!mman_realloc((void **) buf, sizeof(char), buf_len + diff))
+      return false;
+
     buf_avail += diff;
   }
 
