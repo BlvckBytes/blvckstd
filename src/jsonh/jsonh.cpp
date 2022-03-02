@@ -115,7 +115,11 @@ static void jsonh_parse_err(jsonh_cursor_t *cursor, char **err, const char *fmt,
   // Append prefix and write into error buffer
   *err = strfmt_direct(
     "(%ld:%ld) -> %s",
-    cursor->line_index, cursor->char_index,
+
+    // These values are zero-based internally but make
+    // much more sense one-based in error-messages
+    cursor->line_index + 1, cursor->char_index + 1,
+
     errmsg
   );
 }
