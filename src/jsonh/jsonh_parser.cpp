@@ -86,7 +86,7 @@ void jsonh_cursor_ungetc(jsonh_cursor_t *cursor)
   cursor->text_index--;
 }
 
-INLINED static void jsonh_parse_err(jsonh_cursor_t *cursor, char **err, const char *fmt, ...)
+static void jsonh_parse_err(jsonh_cursor_t *cursor, char **err, const char *fmt, ...)
 {
   // No error buffer provided
   if (!err) return;
