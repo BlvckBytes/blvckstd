@@ -311,7 +311,7 @@ jsonh_opres_t jsonh_set_arr(htable_t *jsonh, const char *key, dynarr_t *arr);
 
 /*
 ============================================================================
-                              Array Setters                                 
+                             Array Inserters                                
 ============================================================================
 */
 
