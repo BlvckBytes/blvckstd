@@ -77,6 +77,7 @@ typedef struct jsonh_cursor
   long text_length;        // Number of characters in the text
   long text_index;         // Current character index within the text
 
+  long prev_line_len;      // Length of the line previous to the last \n
   long char_index;         // Index of the current character in the current line
   long line_index;         // Index of the current line in the full text
 } jsonh_cursor_t;

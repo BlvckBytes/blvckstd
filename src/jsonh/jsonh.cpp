@@ -35,6 +35,7 @@ jsonh_cursor_t *jsonh_cursor_make(const char *text)
   cursor->text_index = 0;
 
   // Start out at the first line's first char
+  cursor->prev_line_len = 0;
   cursor->char_index = 0;
   cursor->line_index = 0;
 
@@ -48,6 +49,7 @@ jsonh_char_t jsonh_cursor_getc(jsonh_cursor_t *cursor)
   // Linebreak occurred, update index trackers
   if (ret.c == '\n' && !ret.is_esc)
   {
+    cursor->prev_line_len = cursor->char_index + 1;
     cursor->char_index = 0;
     cursor->line_index++;
   }
@@ -85,16 +87,15 @@ void jsonh_cursor_ungetc(jsonh_cursor_t *cursor)
   if (cursor->text_index == 0)
     return;
 
-  // Rewind character index and also rewind the
-  // line-index if it goes below zero
-  if (
-    cursor->char_index != 0
-    && --(cursor->char_index) < 0
-    && cursor->line_index != 0
-  )
+  // Not at first char of line, just rewind char_index
+  if (cursor->char_index > 0)
+    cursor->char_index--;
+
+  // At first char, wrap back to previous line_index
+  else
   {
+    cursor->char_index = cursor->prev_line_len;
     cursor->line_index--;
-    cursor->char_index = 0;
   }
 
   // Rewind text index marker
@@ -129,6 +130,7 @@ bool jsonh_parse_str(jsonh_cursor_t *cursor, char **err, char **out)
   jsonh_char_t curr;
   if ((curr = jsonh_cursor_getc(cursor)).c != '"')
   {
+    jsonh_cursor_ungetc(cursor);
     jsonh_parse_err(cursor, err, "Expected >\"< but encountered >%c<", curr.c);
     return false;
   }
@@ -152,6 +154,7 @@ bool jsonh_parse_str(jsonh_cursor_t *cursor, char **err, char **out)
     // Non-printable characters need to be escaped inside of strings
     if (curr.c >= 1 && curr.c <= 31 && !curr.is_esc)
     {
+      jsonh_cursor_ungetc(cursor);
       jsonh_parse_err(cursor, err, "Unescaped control sequence inside of string");
       return false;
     }
@@ -201,6 +204,7 @@ bool jsonh_parse_num(jsonh_cursor_t *cursor, char **err, double *out, bool *had_
           continue;
         }
 
+        jsonh_cursor_ungetc(cursor);
         jsonh_parse_err(cursor, err, "Expected a digit or a negative sign, but found >%c<", curr.c);
         return false;
       }
@@ -211,6 +215,7 @@ bool jsonh_parse_num(jsonh_cursor_t *cursor, char **err, double *out, bool *had_
         // Already has a dot
         if (has_dot)
         {
+          jsonh_cursor_ungetc(cursor);
           jsonh_parse_err(cursor, err, "Numbers can only have one comma");
           return false;
         }
@@ -250,6 +255,7 @@ bool jsonh_parse_literal(jsonh_cursor_t *cursor, char **err, jsonh_literal_t *ou
   // Collect literal into buffer
   scptr char *buf = (char *) mman_alloc(sizeof(char), 128, NULL);
   size_t buf_offs = 0;
+  jsonh_cursor_t first_cursor = *cursor;
   while ((curr = jsonh_cursor_getc(cursor)).c)
   {
     // Is a literal delimiter
@@ -296,7 +302,7 @@ bool jsonh_parse_literal(jsonh_cursor_t *cursor, char **err, jsonh_literal_t *ou
     return true;
   }
 
-  jsonh_parse_err(cursor, err, "Unknown literal " QUOTSTR, buf);
+  jsonh_parse_err(&first_cursor, err, "Unknown literal " QUOTSTR, buf);
   return false;
 }
 
@@ -368,6 +374,7 @@ bool jsonh_parse_value(jsonh_cursor_t *cursor, char **err, jsonh_value_t *out)
 
   // Only thing remaining: Literal
   jsonh_literal_t literal;
+  jsonh_cursor_t first_cursor = *cursor;
   if (!jsonh_parse_literal(cursor, err, &literal))
     return false;
 
@@ -388,7 +395,7 @@ bool jsonh_parse_value(jsonh_cursor_t *cursor, char **err, jsonh_value_t *out)
     return true;
 
     default:
-    jsonh_parse_err(cursor, err, "Literal %s not yet implemented", jsonh_literal_name(literal));
+    jsonh_parse_err(&first_cursor, err, "Literal %s not yet implemented", jsonh_literal_name(literal));
     return false;
   }
 }
@@ -399,6 +406,7 @@ bool jsonh_parse_arr(jsonh_cursor_t *cursor, char **err, dynarr_t **out)
   jsonh_char_t curr;
   if ((curr = jsonh_cursor_getc(cursor)).c != '[')
   {
+    jsonh_cursor_ungetc(cursor);
     jsonh_parse_err(cursor, err, "Expected array-begin but found >%c<", curr.c);
     return false;
   }
@@ -413,13 +421,14 @@ bool jsonh_parse_arr(jsonh_cursor_t *cursor, char **err, dynarr_t **out)
 
     // Parse a JSON value
     scptr jsonh_value_t *value = jsonh_value_make(NULL, JDTYPE_NULL);
+    jsonh_cursor_t first_cursor = *cursor;
     if (!jsonh_parse_value(cursor, err, value))
       return false;
     
     dynarr_result_t res;
     if ((res = dynarr_push(arr, mman_ref(value), NULL)) != DYNARR_SUCCESS)
     {
-      jsonh_parse_err(cursor, err, "Could not push array value internally (%s)", dynarr_result_name(res));
+      jsonh_parse_err(&first_cursor, err, "Could not push array value internally (%s)", dynarr_result_name(res));
       mman_dealloc(value);
       return false;
     }
@@ -441,6 +450,7 @@ bool jsonh_parse_arr(jsonh_cursor_t *cursor, char **err, dynarr_t **out)
   // Array end char
   if ((curr = jsonh_cursor_getc(cursor)).c != ']')
   {
+    jsonh_cursor_ungetc(cursor);
     jsonh_parse_err(cursor, err, "Expected array-end but found >%c<", curr.c);
     return false;
   }
@@ -455,6 +465,7 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
   jsonh_char_t curr;
   if ((curr = jsonh_cursor_getc(cursor)).c != '{')
   {
+    jsonh_cursor_ungetc(cursor);
     jsonh_parse_err(cursor, err, "Expected object-begin but found >%c<", curr.c);
     return false;
   }
@@ -477,6 +488,7 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
     // Read k-v separator
     if ((curr = jsonh_cursor_getc(cursor)).c != ':')
     {
+      jsonh_cursor_ungetc(cursor);
       jsonh_parse_err(cursor, err, "Expected >:< but found >%c<", curr.c);
       return false;
     }
@@ -485,6 +497,7 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
 
     // Parse a JSON value
     scptr jsonh_value_t *value = jsonh_value_make(NULL, JDTYPE_NULL);
+    jsonh_cursor_t first_cursor = *cursor;
     if (!jsonh_parse_value(cursor, err, value))
       return false;
 
@@ -493,7 +506,7 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
     htable_result_t res;
     if ((res = htable_insert(obj, key, mman_ref(value))) != HTABLE_SUCCESS)
     {
-      jsonh_parse_err(cursor, err, "Could not push hashtable value internally (%s)", htable_result_name(res));
+      jsonh_parse_err(&first_cursor, err, "Could not push hashtable value internally (%s)", htable_result_name(res));
       mman_dealloc(value);
       return false;
     }
@@ -515,6 +528,7 @@ bool jsonh_parse_obj(jsonh_cursor_t *cursor, char **err, htable_t **out)
   // Object end char
   if ((curr = jsonh_cursor_getc(cursor)).c != '}')
   {
+    jsonh_cursor_ungetc(cursor);
     jsonh_parse_err(cursor, err, "Expected object-end but found >%c<", curr.c);
     return false;
   }
