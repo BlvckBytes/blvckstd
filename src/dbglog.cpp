@@ -9,9 +9,9 @@ void dbgerr(const char *fmt, ...)
   va_end(ap);
 
   #ifdef DBGLOG_ARDUINO
-  Serial.printf("ERR: %s", str);
+  Serial.printf("ERR: %s\n", str);
   #else
-  fprintf(stderr, "ERR: %s", str);
+  fprintf(stderr, "ERR: %s\n", str);
   #endif
 
   #endif
@@ -26,9 +26,9 @@ void dbginf(const char *fmt, ...)
   va_end(ap);
 
   #ifdef DBGLOG_ARDUINO
-  Serial.printf("INF: %s", str);
+  Serial.printf("INF: %s\n", str);
   #else
-  fprintf(stdout, "INF: %s", str);
+  fprintf(stdout, "INF: %s\n", str);
   #endif
 
   #endif
