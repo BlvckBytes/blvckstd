@@ -19,7 +19,7 @@ mman_meta_t *mman_fetch_meta(void *ptr)
   mman_meta_t *meta = (mman_meta_t *) ((char *) ptr - sizeof(mman_meta_t));
   if (ptr != meta->ptr)
   {
-    dbgerr("Invalid resource passed to \"mman_fetch_meta\"!\n");
+    dbgerr("Invalid resource passed to \"mman_fetch_meta\"!");
     return NULL;
   }
 
@@ -140,7 +140,7 @@ mman_meta_t *mman_realloc(void **ptr_ptr, size_t block_size, size_t num_blocks)
   mman_meta_t *meta = mman_fetch_meta(ptr);
   if (ptr != meta->ptr)
   {
-    dbgerr("ERROR: Invalid resource passed to \"mman_realloc\"!\n");
+    dbgerr("ERROR: Invalid resource passed to \"mman_realloc\"!");
     return NULL;
   }
 
@@ -179,7 +179,7 @@ mman_result_t mman_dealloc_force(void *ptr)
   mman_meta_t *meta = mman_fetch_meta(ptr);
   if (!meta)
   {
-    dbgerr("ERROR: mman_dealloc_force received unknown ref!\n");
+    dbgerr("ERROR: mman_dealloc_force received unknown ref!");
     return MMAN_INVREF;
   }
 
@@ -242,7 +242,7 @@ void *mman_ref(void *ptr)
   // Invalid pointer (not mman managed)
   if (!meta)
   {
-    dbgerr("ERROR: mman_ref received unknown ref!\n");
+    dbgerr("ERROR: mman_ref received unknown ref!");
     return NULL;
   }
 
@@ -263,8 +263,8 @@ void mman_print_info()
   // Cache the values before calling the log functions, as they themselves
   // alter the state of those counts
   size_t ac = mman_alloc_count, deac = mman_dealloc_count;
-  dbgerr("----------< MMAN Statistics >----------\n");
-  dbgerr("> Allocated: %lu\n", ac);
-  dbgerr("> Deallocated: %lu\n", deac);
-  dbgerr("----------< MMAN Statistics >----------\n");
+  dbgerr("----------< MMAN Statistics >----------");
+  dbgerr("> Allocated: %lu", ac);
+  dbgerr("> Deallocated: %lu", deac);
+  dbgerr("----------< MMAN Statistics >----------");
 }
