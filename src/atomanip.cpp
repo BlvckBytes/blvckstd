@@ -8,7 +8,13 @@ size_t atomic_add(volatile size_t *target, const size_t value)
   do {
     old = *target;
     n = old + value;
-  } while (!__sync_bool_compare_and_swap(target, old, n));
+  } while (
+    #ifdef ESP8266
+    false
+    #else
+    !__sync_bool_compare_and_swap(target, old, n)
+    #endif
+  );
 
   // Return the new value
   return n;
