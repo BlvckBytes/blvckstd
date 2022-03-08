@@ -198,4 +198,14 @@ void *mman_ref(void *ptr);
  */
 void mman_print_info();
 
+/**
+ * @brief Get the current internal malloc invocation count
+ */
+size_t mman_get_alloc_count();
+
+/**
+ * @brief Get the current internal free invocation count
+ */
+size_t mman_get_dealloc_count();
+
 #endif

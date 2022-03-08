@@ -268,3 +268,13 @@ void mman_print_info()
   dbgerr("> Deallocated: %lu", deac);
   dbgerr("----------< MMAN Statistics >----------");
 }
+
+size_t mman_get_alloc_count()
+{
+  return mman_alloc_count;
+}
+
+size_t mman_get_dealloc_count()
+{
+  return mman_dealloc_count;
+}
