@@ -21,19 +21,19 @@ INLINED static jsonh_opres_t jsonh_get_arr_value(dynarr_t *array, int index, jso
   return JOPRES_SUCCESS;
 }
 
-jsonh_opres_t jsonh_get_arr_obj(dynarr_t *array, int index, htable_t *obj)
+jsonh_opres_t jsonh_get_arr_obj(dynarr_t *array, int index, htable_t **obj)
 {
-  return jsonh_get_arr_value(array, index, JDTYPE_OBJ, (void **) &obj);
+  return jsonh_get_arr_value(array, index, JDTYPE_OBJ, (void **) obj);
 }
 
-jsonh_opres_t jsonh_get_arr_arr(dynarr_t *array, int index, dynarr_t *arr)
+jsonh_opres_t jsonh_get_arr_arr(dynarr_t *array, int index, dynarr_t **arr)
 {
-  return jsonh_get_arr_value(array, index, JDTYPE_ARR, (void **) &arr);
+  return jsonh_get_arr_value(array, index, JDTYPE_ARR, (void **) arr);
 }
 
-jsonh_opres_t jsonh_get_arr_str(dynarr_t *array, int index, char *str)
+jsonh_opres_t jsonh_get_arr_str(dynarr_t *array, int index, char **str)
 {
-  return jsonh_get_arr_value(array, index, JDTYPE_STR, (void **) &str);
+  return jsonh_get_arr_value(array, index, JDTYPE_STR, (void **) str);
 }
 
 jsonh_opres_t jsonh_get_arr_int(dynarr_t *array, int index, int *num)
