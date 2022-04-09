@@ -171,9 +171,9 @@ static void jsonh_stringify_arr(dynarr_t *arr, int indent, int indent_level, cha
   strfmt(buf, buf_offs, "%s]", indent_str_outer);
 }
 
-char *jsonh_stringify(htable_t *jsonh, int indent)
+char *jsonh_stringify(htable_t *jsonh, int indent, size_t initial_buf_size)
 {
-  scptr char *buf = (char *) mman_alloc(sizeof(char), 512, NULL);
+  scptr char *buf = (char *) mman_alloc(sizeof(char), initial_buf_size, NULL);
   size_t buf_offs = 0;
 
   jsonh_stringify_obj(jsonh, indent, 1, &buf, &buf_offs);

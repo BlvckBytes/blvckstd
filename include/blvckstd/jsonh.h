@@ -222,10 +222,11 @@ htable_t *jsonh_parse(const char *json, char **err);
  * 
  * @param jsonh Json handler instance
  * @param indent Number of spaces a level of indentation is made of
+ * @param initial_buf_size Initial size of the string buffer that gets concat'ed into
  * 
  * @return char* Stringified result
  */
-char *jsonh_stringify(htable_t *jsonh, int indent);
+char *jsonh_stringify(htable_t *jsonh, int indent, size_t initial_buf_size);
 
 /*
 ============================================================================
