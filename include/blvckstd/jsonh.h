@@ -242,7 +242,7 @@ char *jsonh_stringify(htable_t *jsonh, int indent);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_set_obj(htable_t *jsonh, const char *key, htable_t *obj);
+jsonh_opres_t jsonh_set_obj(htable_t *jsonh, const char *key, void *obj);
 
 /**
  * @brief Set the value of a given key to another JSON object and automatically create or destroy a new ref
@@ -264,7 +264,7 @@ jsonh_opres_t jsonh_set_obj_ref(htable_t *jsonh, const char *key, void *obj);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_set_str(htable_t *jsonh, const char *key, char *str);
+jsonh_opres_t jsonh_set_str(htable_t *jsonh, const char *key, void *str);
 
 /**
  * @brief Set the value of a given key to a string and automatically create or destroy a new ref
@@ -329,7 +329,7 @@ jsonh_opres_t jsonh_set_null(htable_t *jsonh, const char *key);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_set_arr(htable_t *jsonh, const char *key, dynarr_t *arr);
+jsonh_opres_t jsonh_set_arr(htable_t *jsonh, const char *key, void *arr);
 
 /**
  * @brief Set the value of a given key to a JSON array and automatically create or destroy a new ref
@@ -349,6 +349,16 @@ jsonh_opres_t jsonh_set_arr_ref(htable_t *jsonh, const char *key, void *arr);
 */
 
 /**
+ * @brief Insert an object into a JSON array and automatically create or destroy a new ref
+ * 
+ * @param array Json array instance
+ * @param obj Object to insert
+ * 
+ * @return jsonh_opres_t Operation result
+ */
+jsonh_opres_t jsonh_insert_arr_obj(dynarr_t *array, void *obj);
+
+/**
  * @brief Insert an object into a JSON array
  * 
  * @param array Json array instance
@@ -356,17 +366,27 @@ jsonh_opres_t jsonh_set_arr_ref(htable_t *jsonh, const char *key, void *arr);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_insert_arr_obj(dynarr_t *array, htable_t *obj);
+jsonh_opres_t jsonh_insert_arr_obj_ref(dynarr_t *array, void *obj);
 
 /**
- * @brief Insert an array into a JSON array
+ * @brief Insert an array into a JSON array and automatically create or destroy a new ref
  * 
  * @param array Json array instance
  * @param arr Array to insert
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_insert_arr_arr(dynarr_t *array, dynarr_t *arr);
+jsonh_opres_t jsonh_insert_arr_arr(dynarr_t *array, void *arr);
+
+/**
+ * @brief Insert an array into a JSON array and automatically create or destroy a new ref
+ * 
+ * @param array Json array instance
+ * @param arr Array to insert
+ * 
+ * @return jsonh_opres_t Operation result
+ */
+jsonh_opres_t jsonh_insert_arr_arr_ref(dynarr_t *array, void *arr);
 
 /**
  * @brief Insert a string into a JSON array
@@ -376,7 +396,17 @@ jsonh_opres_t jsonh_insert_arr_arr(dynarr_t *array, dynarr_t *arr);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_insert_arr_str(dynarr_t *array, char *str);
+jsonh_opres_t jsonh_insert_arr_str(dynarr_t *array, void *str);
+
+/**
+ * @brief Insert a string into a JSON array and automatically create or destroy a new ref
+ * 
+ * @param array Json array instance
+ * @param str String to insert
+ * 
+ * @return jsonh_opres_t Operation result
+ */
+jsonh_opres_t jsonh_insert_arr_str_ref(dynarr_t *array, void *str);
 
 /**
  * @brief Insert an int into a JSON array

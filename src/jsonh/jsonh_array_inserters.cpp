@@ -16,19 +16,43 @@ INLINED static jsonh_opres_t jsonh_insert_value(dynarr_t *array, void *val, json
   return JOPRES_SIZELIM_EXCEED;
 }
 
-jsonh_opres_t jsonh_insert_arr_obj(dynarr_t *array, htable_t *obj)
+jsonh_opres_t jsonh_insert_arr_obj(dynarr_t *array, void *obj)
 {
-  return jsonh_insert_value(array, (void *) obj, JDTYPE_OBJ);
+  return jsonh_insert_value(array, obj, JDTYPE_OBJ);
 }
 
-jsonh_opres_t jsonh_insert_arr_arr(dynarr_t *array, dynarr_t *arr)
+jsonh_opres_t jsonh_insert_arr_obj_ref(dynarr_t *array, void *obj)
 {
-  return jsonh_insert_value(array, (void *) arr, JDTYPE_ARR);
+  jsonh_opres_t res = jsonh_insert_value(array, mman_ref(obj), JDTYPE_OBJ);
+  if (res != JOPRES_SUCCESS)
+    mman_dealloc(obj);
+  return res;
+}
+
+jsonh_opres_t jsonh_insert_arr_arr(dynarr_t *array, void *arr)
+{
+  return jsonh_insert_value(array, arr, JDTYPE_ARR);
+}
+
+jsonh_opres_t jsonh_insert_arr_arr_ref(dynarr_t *array, void *arr)
+{
+  jsonh_opres_t res = jsonh_insert_value(array, mman_ref(arr), JDTYPE_ARR);
+  if (res != JOPRES_SUCCESS)
+    mman_dealloc(arr);
+  return res;
 }
 
 jsonh_opres_t jsonh_insert_arr_str(dynarr_t *array, char *str)
 {
   return jsonh_insert_value(array, (void *) str, JDTYPE_STR);
+}
+
+jsonh_opres_t jsonh_insert_arr_str_ref(dynarr_t *array, void *str)
+{
+  jsonh_opres_t res = jsonh_insert_value(array, mman_ref(str), JDTYPE_STR);
+  if (res != JOPRES_SUCCESS)
+    mman_dealloc(str);
+  return res;
 }
 
 jsonh_opres_t jsonh_insert_arr_int(dynarr_t *array, int num)
