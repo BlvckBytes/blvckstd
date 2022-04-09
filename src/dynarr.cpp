@@ -202,10 +202,10 @@ void dynarr_clear(dynarr_t *arr)
   }
 }
 
-size_t *dynarr_indices(dynarr_t *arr)
+void dynarr_indices(dynarr_t *arr, size_t **active, size_t *num_active)
 {
-  size_t active_slots = dynarr_count_used_slots(arr);
-  scptr size_t *indices = (size_t *) mman_alloc(sizeof(size_t), active_slots, NULL);
+  *num_active = dynarr_count_used_slots(arr);
+  *active = (size_t *) mman_alloc(sizeof(size_t), *num_active, NULL);
 
   // Collect all active indices
   size_t indices_i = 0;
@@ -216,8 +216,6 @@ size_t *dynarr_indices(dynarr_t *arr)
       continue;
 
     // Store index
-    indices[indices_i++] = i;
+    (*active)[indices_i++] = i;
   }
-
-  return (size_t *) mman_ref(indices);
 }

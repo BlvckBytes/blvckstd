@@ -121,8 +121,9 @@ void dynarr_clear(dynarr_t *arr);
  * @brief Get all active indices of a dynamic array
  * 
  * @param arr Array to look into
- * @return size_t* Array of active indices
+ * @param active Active indices output
+ * @param num_active Number of active indices output
  */
-size_t *dynarr_indices(dynarr_t *arr);
+void dynarr_indices(dynarr_t *arr, size_t **active, size_t *num_active);
 
 #endif
