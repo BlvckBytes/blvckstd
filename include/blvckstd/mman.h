@@ -51,9 +51,13 @@ typedef struct mman_meta
   // INFO: This is used in conjunction with mman_alloc resources
   mman_cleanup_f_t cf;
 
+  #ifdef MMAN_WRAPPING
+
   // Cleanup function invoked before the whole malloc gets free'd
   // INFO: This is used in conjunction with mman_wrap resources
   clfn_t cf_wrapped;
+
+  #endif
 
   // Number of active references pointing at this resource
   volatile size_t refs;
@@ -98,6 +102,7 @@ mman_meta_t *mman_fetch_meta(void *ptr);
  */
 void *mman_alloc(size_t block_size, size_t num_blocks, mman_cleanup_f_t cf);
 
+#ifdef MMAN_WRAPPING
 /**
  * @brief Wrap an existing pointer to also be managed in an mman-style
  * 
@@ -106,6 +111,7 @@ void *mman_alloc(size_t block_size, size_t num_blocks, mman_cleanup_f_t cf);
  * @return void** Pointer to the managed pointer
  */
 void **mman_wrap(void *ptr, clfn_t cf);
+#endif
 
 /**
  * @brief Allocate zero-initialized memory and get a managed reference to it
