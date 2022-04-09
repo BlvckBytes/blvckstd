@@ -245,6 +245,17 @@ char *jsonh_stringify(htable_t *jsonh, int indent);
 jsonh_opres_t jsonh_set_obj(htable_t *jsonh, const char *key, htable_t *obj);
 
 /**
+ * @brief Set the value of a given key to another JSON object and automatically create or destroy a new ref
+ * 
+ * @param jsonh Json handler instance
+ * @param key Key to set
+ * @param obj JSON object
+ * 
+ * @return jsonh_opres_t Operation result
+ */
+jsonh_opres_t jsonh_set_obj_ref(htable_t *jsonh, const char *key, void *obj);
+
+/**
  * @brief Set the value of a given key to a string
  * 
  * @param jsonh Json handler instance
@@ -254,6 +265,17 @@ jsonh_opres_t jsonh_set_obj(htable_t *jsonh, const char *key, htable_t *obj);
  * @return jsonh_opres_t Operation result
  */
 jsonh_opres_t jsonh_set_str(htable_t *jsonh, const char *key, char *str);
+
+/**
+ * @brief Set the value of a given key to a string and automatically create or destroy a new ref
+ * 
+ * @param jsonh Json handler instance
+ * @param key Key to set
+ * @param obj String value
+ * 
+ * @return jsonh_opres_t Operation result
+ */
+jsonh_opres_t jsonh_set_str_ref(htable_t *jsonh, const char *key, void *str);
 
 /**
  * @brief Set the value of a given key to an integer
@@ -308,6 +330,17 @@ jsonh_opres_t jsonh_set_null(htable_t *jsonh, const char *key);
  * @return jsonh_opres_t Operation result
  */
 jsonh_opres_t jsonh_set_arr(htable_t *jsonh, const char *key, dynarr_t *arr);
+
+/**
+ * @brief Set the value of a given key to a JSON array and automatically create or destroy a new ref
+ * 
+ * @param jsonh Json handler instance
+ * @param key Key to set
+ * @param obj JSON array
+ * 
+ * @return jsonh_opres_t Operation result
+ */
+jsonh_opres_t jsonh_set_arr_ref(htable_t *jsonh, const char *key, void *arr);
 
 /*
 ============================================================================
