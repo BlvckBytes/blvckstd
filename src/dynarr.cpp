@@ -153,17 +153,23 @@ char *dynarr_dump_hr(dynarr_t *arr, stringifier_t stringifier)
   return (char *) mman_ref(buf);
 }
 
-size_t dynarr_as_array(dynarr_t *arr, void ***out)
+INLINED static size_t dynarr_count_used_slots(dynarr_t *arr)
 {
-  // No output buffer provided
-  if (!out) return 0;
-
   // Count number of active slots
   size_t active_slots = 0;
   for (size_t i = 0; i < arr->_array_size; i++)
     if (arr->items[i]) active_slots++;
 
+  return active_slots;
+}
+
+size_t dynarr_as_array(dynarr_t *arr, void ***out)
+{
+  // No output buffer provided
+  if (!out) return 0;
+
   // Create array
+  size_t active_slots = dynarr_count_used_slots(arr);
   scptr void **res = (void **) mman_alloc(sizeof(void *), active_slots + 1, NULL);
 
   // Copy over pointers
@@ -194,4 +200,24 @@ void dynarr_clear(dynarr_t *arr)
     if (dynarr_remove_at(arr, i, &elem) == DYNARR_SUCCESS)
       mman_dealloc(elem);
   }
+}
+
+size_t *dynarr_indices(dynarr_t *arr)
+{
+  size_t active_slots = dynarr_count_used_slots(arr);
+  scptr size_t *indices = (size_t *) mman_alloc(sizeof(size_t), active_slots, NULL);
+
+  // Collect all active indices
+  size_t indices_i = 0;
+  for (size_t i = 0; i < arr->_array_size; i++)
+  {
+    // Slot is empty
+    if (!arr->items[i])
+      continue;
+
+    // Store index
+    indices[indices_i++] = i;
+  }
+
+  return (size_t *) mman_ref(indices);
 }
