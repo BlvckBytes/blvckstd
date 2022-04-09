@@ -30,14 +30,30 @@ INLINED static jsonh_opres_t jsonh_set_value(htable_t *jsonh, const char *key, v
   return JOPRES_SIZELIM_EXCEED;
 }
 
-jsonh_opres_t jsonh_set_obj(htable_t *jsonh, const char *key, htable_t *obj)
+jsonh_opres_t jsonh_set_obj(htable_t *jsonh, const char *key, void *obj)
 {
-  return jsonh_set_value(jsonh, key, (void *) obj, JDTYPE_OBJ);
+  return jsonh_set_value(jsonh, key, obj, JDTYPE_OBJ);
 }
 
-jsonh_opres_t jsonh_set_str(htable_t *jsonh, const char *key, char *str)
+jsonh_opres_t jsonh_set_obj_ref(htable_t *jsonh, const char *key, void *obj)
 {
-  return jsonh_set_value(jsonh, key, (void *) str, JDTYPE_STR);
+  jsonh_opres_t res = jsonh_set_value(jsonh, key, mman_ref(obj), JDTYPE_OBJ);
+  if (res != JOPRES_SUCCESS)
+    mman_dealloc(obj);
+  return res;
+}
+
+jsonh_opres_t jsonh_set_str(htable_t *jsonh, const char *key, void *str)
+{
+  return jsonh_set_value(jsonh, key, str, JDTYPE_STR);
+}
+
+jsonh_opres_t jsonh_set_str_ref(htable_t *jsonh, const char *key, void *str)
+{
+  jsonh_opres_t res = jsonh_set_value(jsonh, key, mman_ref(str), JDTYPE_STR);
+  if (res != JOPRES_SUCCESS)
+    mman_dealloc(str);
+  return res;
 }
 
 jsonh_opres_t jsonh_set_int(htable_t *jsonh, const char *key, int num)
@@ -81,7 +97,15 @@ jsonh_opres_t jsonh_set_null(htable_t *jsonh, const char *key)
   return jsonh_set_value(jsonh, key, NULL, JDTYPE_NULL);
 }
 
-jsonh_opres_t jsonh_set_arr(htable_t *jsonh, const char *key, dynarr_t *arr)
+jsonh_opres_t jsonh_set_arr(htable_t *jsonh, const char *key, void *arr)
 {
-  return jsonh_set_value(jsonh, key, (void *) arr, JDTYPE_ARR);
+  return jsonh_set_value(jsonh, key, arr, JDTYPE_ARR);
+}
+
+jsonh_opres_t jsonh_set_arr_ref(htable_t *jsonh, const char *key, void *arr)
+{
+  jsonh_opres_t res = jsonh_set_value(jsonh, key, mman_ref(arr), JDTYPE_ARR);
+  if (res != JOPRES_SUCCESS)
+    mman_dealloc(arr);
+  return res;
 }
