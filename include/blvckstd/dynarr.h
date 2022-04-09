@@ -47,6 +47,23 @@ ENUM_TYPEDEF_FULL_IMPL(dynarr_result, _EVALS_DYNARR_RES);
 dynarr_t *dynarr_make(size_t array_size, size_t array_max_size, clfn_t cf);
 
 /**
+ * @brief Make a new, empty array using the mman resource deallocator
+ * 
+ * @param array_size Size of the array
+ * @param array_max_size Maximum size of the array, set to array_size for no automatic growth
+ * @return dynarr_t* Pointer to the new array
+ */
+dynarr_t *dynarr_make_mm(size_t array_size, size_t array_max_size);
+
+/**
+ * @brief Make a new, empty array with a fixed size, using the mman resource deallocator
+ * 
+ * @param array_size Size of the array
+ * @return dynarr_t* Pointer to the new array
+ */
+dynarr_t *dynarr_make_mmf(size_t array_size);
+
+/**
  * @brief Push a new item into the array
  * 
  * @param arr Array reference
