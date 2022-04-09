@@ -553,7 +553,7 @@ jsonh_opres_t jsonh_get_is_null(htable_t *jsonh, const char *key, bool *is_null)
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_get_arr_obj(dynarr_t *array, int index, htable_t *obj);
+jsonh_opres_t jsonh_get_arr_obj(dynarr_t *array, int index, htable_t **obj);
 
 /**
  * @brief Get the value of a slot as an array
@@ -564,7 +564,7 @@ jsonh_opres_t jsonh_get_arr_obj(dynarr_t *array, int index, htable_t *obj);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_get_arr_arr(dynarr_t *array, int index, dynarr_t *arr);
+jsonh_opres_t jsonh_get_arr_arr(dynarr_t *array, int index, dynarr_t **arr);
 
 /**
  * @brief Get the value of a slot as a string
@@ -575,7 +575,7 @@ jsonh_opres_t jsonh_get_arr_arr(dynarr_t *array, int index, dynarr_t *arr);
  * 
  * @return jsonh_opres_t Operation result
  */
-jsonh_opres_t jsonh_get_arr_str(dynarr_t *array, int index, char *str);
+jsonh_opres_t jsonh_get_arr_str(dynarr_t *array, int index, char **str);
 
 /**
  * @brief Get the value of a slot as an integer
